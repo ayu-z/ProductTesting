@@ -1,0 +1,3 @@
+tftpboot 2022-12-04-x5sw7203emmc.ubi
+tftpboot 2023-05-02-x5sw7203.bin
+flash rootfs

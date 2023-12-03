@@ -1,0 +1,5 @@
+1. 修改mac.txt为你要设置的mac地址, record.txt为mac地址写入的记录
+2.运行phpstudy
+3.网线连接路由器LAN口,电脑IP设置为192.168.11.100
+4.打开浏览器进入http://192.168.11.1/setmac.asp  ,点击“SetMac”，SetMAC每点击一次，
+mac.txt里的地址会写到路由里，并修改把mac.txt里的值加2

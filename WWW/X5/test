@@ -1,0 +1,12 @@
+
+config server 'server'
+	option sn '00037f123456'
+
+config start 'test'
+	option hub_faile '0'
+	option start_num '0'
+	option hub_ok '0'
+	option hub_faile_wifi '0'
+	option start_num_wifi'0'
+	option hub_ok_wifi '0'
+

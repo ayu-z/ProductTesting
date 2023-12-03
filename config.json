@@ -1,0 +1,6 @@
+{
+    "target_ip": "192.168.11.1",
+    "ssh_username": "root",
+    "ssh_password": "link4all123456",
+    "commands_to_run": ["ls /etc", "uptime", "cat /etc/config/network"]
+}

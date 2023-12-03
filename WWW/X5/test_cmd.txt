@@ -1,0 +1,1 @@
+mv test /etc/config/test;mv test_start /etc/init.d/test_start;chmod 755 /etc/init.d/test_start;/etc/init.d/test_start enable;/etc/init.d/test_start start
