@@ -4,6 +4,7 @@ import time
 import re
 import platform
 import json
+import sys
 from paramiko import SSHClient
 from scp import SCPClient
 
@@ -39,7 +40,7 @@ class SSHClient:
 
     def download_file(self, remote_path, local_path):
         try:
-            with SCPClient(self.client.get_transport()) as scp:
+            with SCPClient(self.client.get_transport(), progress=self.progress) as scp:
                 scp.get(remote_path, local_path)
             print(f"Downloaded file from {remote_path} to {local_path}")
         except Exception as e:
@@ -47,11 +48,15 @@ class SSHClient:
             
     def upload_file(self, local_path, remote_path):
         try:
-            with SCPClient(self.client.get_transport()) as scp:
+            with SCPClient(self.client.get_transport(), progress=self.progress) as scp:
                 scp.put(local_path, remote_path)
             print(f"Uploaded file from {local_path} to {remote_path}")
         except Exception as e:
             print(f"Error uploading file: {str(e)}")
+            
+    def progress(self, filename, size, sent):
+        sys.stdout.write(f"\rTransferring {filename}: {sent}/{size} bytes ({int(sent / size * 100)}%)\n")
+        sys.stdout.flush()
 
     def send_command(self, command):
         output = ""
@@ -153,7 +158,7 @@ if __name__ == "__main__":
     while True:
         if is_pingable(target_ip):
             ssh.connect()
-            # ssh.upload_file(local_file_path, remote_file_path)
+            ssh.upload_file(local_file_path, remote_file_path)
             ssh.getModel()
             ssh.getMac()
             ssh.getFirmwareVersion()
