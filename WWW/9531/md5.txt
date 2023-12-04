@@ -1,3 +1,0 @@
-SHA1 的 2022-05-16-miniv2.bin 哈希:
-b9fdb230ddacab47b250a1048ba8792f45fc072f
-CertUtil: -hashfile 命令成功完成。

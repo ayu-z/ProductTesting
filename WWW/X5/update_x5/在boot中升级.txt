@@ -1,6 +1,0 @@
-#升级到老的固件需要拿去过仪器
-tftpb norplusnand-ipq6018_64-single.img;imgaddr=$fileaddr;source $imgaddr:script
-
-#升级到新的固件用于出货
-ping 192.168.10.2;tftpb 12.0-ipq6018-u-boot.mbn;sf probe;sf erase 0x5c0000 +0xa0000;sf write 0x44000000 0x5c0000 0xa0000;tftpb 2022-05-10-x5.ubi;flash rootfs
-
