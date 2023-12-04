@@ -2,21 +2,18 @@ import subprocess
 import paramiko
 import time
 import re
-import platform
+import ping3
 import json
 import sys
 from paramiko import SSHClient
 from scp import SCPClient
 
-def is_pingable(host):
-    try:
-        system_type = platform.system().lower()
-        if system_type == "windows":
-            subprocess.check_output(["ping", "-n", "1", host], shell=True)
-        else:
-            subprocess.check_output(["ping", "-c", "1", host])
+def is_pingable(ip):
+    if ping3.ping(ip) is not None:
+        print(f"Ping {ip} successful")
         return True
-    except subprocess.CalledProcessError:
+    else:
+        print(f"Ping {ip} failed")
         return False
 
 class SSHClient:
@@ -33,10 +30,12 @@ class SSHClient:
             self.client.connect(self.host, username=self.username, password=self.password)
             print(f"SSH connection to {self.host} successful")
             self.sftp = self.client.open_sftp()
+            return True 
         except paramiko.AuthenticationException:
             print(f"Failed to authenticate to {self.host}")
         except paramiko.SSHException as e:
             print(f"SSH connection to {self.host} failed: {str(e)}")
+        return False 
 
     def download_file(self, remote_path, local_path):
         try:
@@ -83,11 +82,18 @@ class SSHClient:
         command = [
             ". /lib/functions.sh",
             ". /lib/functions/system.sh",
-            "mac=`mtd_get_mac_binary Factory 4 |tr -d ':'`",
+            "mac=`mtd_get_mac_binary factory 4116 |tr -d ':'`",
             "echo $mac"
         ]
+        # command = [
+        #     ". /lib/functions.sh",
+        #     ". /lib/functions/system.sh",
+        #     "mac=`mtd_get_mac_binary '0:ART' 4116 |tr -d ':'`",
+        #     "echo $mac"
+        # ]
         result = self.send_command(" && ".join(command)).strip()
-        print(f"Device Mac Address:{result}")
+        if result is not None:
+            print(f"Device Mac Address:{result}")
 
     def getModel(self):
         result = self.send_command("cat /tmp/sysinfo/model").strip()  
@@ -108,8 +114,9 @@ class SSHClient:
             print(f"{tty} loopBack test success")   
         
     def getWifiAP(self):
-        result = self.send_command("iwinfo | awk '/ESSID/ && $3 != \"unknown\" {print \"SSID: \" $3} /Access Point/ && $3 != \"00:00:00:00:00:00\" {print \"MAC Address: \" $3}'")
-        
+        # result = self.send_command("iwinfo | awk '/ESSID/ && $3 != \"unknown\" {print \"SSID: \" $3} /Access Point/ && $3 != \"00:00:00:00:00:00\" {print \"MAC Address: \" $3}'|tr -d '\n'")
+        result = self.send_command("uci show wireless | awk -F'.' '/mode='"'"\'ap\'"'"'/ && !seen[$2]++ {print $2;}' | while read -r config_name; do uci get wireless.\"$config_name\".ssid; done").strip()
+        print(result)
         return
         
     def getModemInfo(self,uartTool):
@@ -154,21 +161,24 @@ if __name__ == "__main__":
     remote_file_path = "/tmp/file.txt"
 
     ssh = SSHClient(target_ip, ssh_username, ssh_password)
-
     while True:
         if is_pingable(target_ip):
+            pause = 1
             ssh.connect()
             ssh.upload_file(local_file_path, remote_file_path)
             ssh.getModel()
             ssh.getMac()
             ssh.getFirmwareVersion()
             # ssh.setMac("18c3f4a200e6")
+            # ssh.getWifiAP()
             ssh.loopBackUart('at_tool', '/dev/ttyUSB2')
             # for command in config_data["commands_to_run"]:
             #     result = ssh.send_command(command)
             #     print(f"Command Output for '{command}': {result}")
             ssh.disconnect()
-            break
+            # break
+            while(1):
+                time.sleep(1)
         else:
             print(f"Waiting for {target_ip} to respond...")
             time.sleep(1)

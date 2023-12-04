@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout
 from qfluentwidgets import (setTheme, setFont, Theme, MSFluentWindow, SubtitleLabel, SplashScreen)
 from qfluentwidgets import FluentIcon as FIF
 
-from UI_Home import displayHomeInterface
+from appHomeInterFace import displayHomeInterface
 
 class Widget(QFrame):
 
@@ -27,7 +27,7 @@ class Window(MSFluentWindow):
     def __init__(self):
         super().__init__()
         # create sub interface
-        self.homeInterface = displayHomeInterface("self")
+        self.homeInterface = displayHomeInterface()
         self.appInterface = Widget('开发中...')
         
         self.initNavigation()
@@ -43,17 +43,18 @@ class Window(MSFluentWindow):
         self.splashScreen.setIconSize(QSize(102, 102))
         self.show()
         # create other subinterfaces
-        loop = QEventLoop()
-        QTimer.singleShot(1000, loop.quit)
-        loop.exec()
+        # loop = QEventLoop()
+        # QTimer.singleShot(1000, loop.quit)
+        # loop.exec()
         # close splash screen
         self.splashScreen.finish()
 
 
     def initWindow(self):
-        self.resize(900, 700)
+        # self.resize(900, 700)
         self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
         self.setWindowTitle('PyQt-Fluent-Widgets')
+        self.setFixedSize(900, 700); 
 
         desktop = QApplication.desktop().availableGeometry()
         w, h = desktop.width(), desktop.height()
@@ -61,8 +62,6 @@ class Window(MSFluentWindow):
 
         self.initSplashScreen()
         
-
-
 
 if __name__ == '__main__':
     QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)

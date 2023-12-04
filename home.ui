@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>830</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="PrimaryPushButton" name="PrimaryPushButton">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>590</y>
+     <width>153</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Primary push button</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>10</y>
+     <width>171</width>
+     <height>285</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="SubtitleLabel" name="SubtitleLabel">
+      <property name="text">
+       <string>型号</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="ComboBox" name="ComboBox"/>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="CheckBox" name="CheckBox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>29</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>启用 MAC 写入</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="SubtitleLabel" name="SubtitleLabel_3">
+      <property name="text">
+       <string>MAC起始地址</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="LineEdit" name="LineEdit">
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="SubtitleLabel" name="SubtitleLabel_4">
+      <property name="text">
+       <string>累加</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="SpinBox" name="SpinBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>601</width>
+     <height>631</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="SubtitleLabel" name="SubtitleLabel_2">
+      <property name="text">
+       <string>型号</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_6">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_7">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="BodyLabel" name="BodyLabel_6">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_8">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="BodyLabel" name="BodyLabel_8">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_9">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_10">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="BodyLabel" name="BodyLabel_10">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_11">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="BodyLabel" name="BodyLabel_11">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="BodyLabel" name="BodyLabel_9">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="BodyLabel" name="BodyLabel_12">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_13">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="BodyLabel" name="BodyLabel_13">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="StrongBodyLabel" name="StrongBodyLabel_12">
+        <property name="text">
+         <string>Strong body label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="BodyLabel" name="BodyLabel_14">
+        <property name="text">
+         <string>Body label</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="SubtitleLabel" name="SubtitleLabel_5">
+      <property name="text">
+       <string>测试Log</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="TextEdit" name="TextEdit"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>PushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>PrimaryPushButton</class>
+   <extends>PushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>StrongBodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SubtitleLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
