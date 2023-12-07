@@ -3,17 +3,20 @@ import sys
 from pathlib import Path
 
 from PyQt5.QtCore import Qt, QPoint, QSize, QUrl, QRect, QPropertyAnimation, QEventLoop, QTimer, QFileInfo
-from PyQt5.QtGui import QIcon, QFont, QColor, QPainter
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QGraphicsOpacityEffect, QFrame, QAbstractButton, QSpacerItem, QSizePolicy, QFileDialog
+from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QPixmap
+from PyQt5.QtWidgets import (QApplication, QWidget, QHBoxLayout, QVBoxLayout, QGraphicsOpacityEffect, QFrame, 
+                            QAbstractButton, QSpacerItem, QSizePolicy, QFileDialog, QPushButton, QTableWidget, QTableWidgetItem)
 
 from qfluentwidgets import (CardWidget, setTheme, Theme, IconWidget, BodyLabel, CaptionLabel, PushButton,
                             TransparentToolButton, FluentIcon, RoundMenu, Action, ElevatedCardWidget,
                             ImageLabel, isDarkTheme, FlowLayout, MSFluentTitleBar, SimpleCardWidget,
                             HeaderCardWidget, InfoBarIcon, HyperlinkLabel, HorizontalFlipView,
                             PrimaryPushButton, TitleLabel, PillPushButton, setFont, SingleDirectionScrollArea,
-                            VerticalSeparator, MSFluentWindow, NavigationItemPosition, SplashScreen, SubtitleLabel, CheckBox, LineEdit, CompactSpinBox)
+                            VerticalSeparator, MSFluentWindow, NavigationItemPosition, SplashScreen, SubtitleLabel, 
+                            CheckBox, LineEdit, CompactSpinBox, ToolButton, TextEdit)
 
 from qfluentwidgets.components.widgets.acrylic_label import AcrylicBrush
+
 
 
 class DeviceInfoCard(SimpleCardWidget):
@@ -22,68 +25,60 @@ class DeviceInfoCard(SimpleCardWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         root = QFileInfo(__file__).absolutePath()
-        self.iconLabel = ImageLabel(root + "./resource/images/M21L2S.jpg", self)
-        self.iconLabel.setBorderRadius(8, 8, 8, 8)
-        self.iconLabel.scaledToWidth(120)
-
-        self.nameLabel = TitleLabel('M21L2S', self)
-        self.testButton = PrimaryPushButton('测试', self)
-        self.companyLabel = HyperlinkLabel(QUrl('https://www.iyunlink.com/'), 'IYUNLINK Inc.', self)
-        self.testButton.setFixedWidth(160)
-    
-        self.descriptionLabel = BodyLabel('', self)
-        self.descriptionLabel.setWordWrap(True)
-
-        self.settingButton = TransparentToolButton(FluentIcon.SETTING, self)
-        self.settingButton.setFixedSize(32, 32)
-        self.settingButton.setIconSize(QSize(14, 14))
+        self.ToolButton_Model = ToolButton(root + "./resource/images/M21L2S.jpg")
+        self.ToolButton_Model.setStyleSheet("background-color: rgba(0, 0, 0, 0);")
+        self.ToolButton_Model.setIconSize(QSize(150, 150))
+        self.ToolButton_Model.resize(150, 150)
+        self.ToolButton_Model.clicked.connect(self.selection_model)
+        
+        self.TitleLabel_Model = TitleLabel('M21L2S', self)
+        self.textEdit_DeviceInfo = TextEdit(self)
+        data = "Header1\tHeader2\nValue1\tValue2\nData1\tData2\nOK\nNG"
+        aligned_data = self.align_multiline_text(data)
+        self.textEdit_DeviceInfo.setMarkdown(aligned_data)
+        self.textEdit_DeviceInfo.setFixedSize(600, 150)
+        self.textEdit_DeviceInfo.setReadOnly(True)
+        self.textEdit_DeviceInfo.setFocusPolicy(Qt.NoFocus)
+        self.textEdit_DeviceInfo.setStyleSheet("TextEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
 
         self.hBoxLayout = QHBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
-        self.topLayout = QHBoxLayout()
-        self.statisticsLayout = QHBoxLayout()
-        self.buttonLayout = QHBoxLayout()
-
         self.initLayout()
 
     def initLayout(self):
-        self.hBoxLayout.setSpacing(30)
-        self.hBoxLayout.setContentsMargins(34, 24, 24, 24)
-        self.hBoxLayout.addWidget(self.iconLabel)
+        self.hBoxLayout.setSpacing(0)
+        self.hBoxLayout.setContentsMargins(10, 10, 10, 10)
+        self.hBoxLayout.addWidget(self.ToolButton_Model, 0, Qt.AlignLeft)
         self.hBoxLayout.addLayout(self.vBoxLayout)
 
         self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
-        self.vBoxLayout.setSpacing(0)
+        self.vBoxLayout.addWidget(self.TitleLabel_Model, 0, Qt.AlignLeft)
+        self.vBoxLayout.addWidget(self.textEdit_DeviceInfo, 0, Qt.AlignLeft)
+        
+    def align_multiline_text(self, data):
+        T_OK = '<span style="background-color: #4CAF50; color: #ffffff; padding: 5px; display: inline-block;"> OK </span>'
+        T_NG = '<span style="background-color: #FF0000; color: #ffffff; padding: 5px; display: inline-block;"> NG </span>'
+        lines = data.split('\n')
+        max_widths = [max(len(field) for field in line.split('\t')) for line in lines]
+        aligned_lines = []
+        for line in lines:
+            fields = line.split('\t')
+            aligned_fields = ["{:<{}}".format(field, max_width) for field, max_width in zip(fields, max_widths)]
+            aligned_line = '#### '+'\t\t\t'.join(aligned_fields)
 
-        # name label and install button
-        self.vBoxLayout.addLayout(self.topLayout)
-        self.topLayout.setContentsMargins(0, 0, 0, 0)
-        self.topLayout.addWidget(self.nameLabel)
-        self.topLayout.addWidget(self.testButton, 0, Qt.AlignRight)
-        # self.vBoxLayout.addWidget(self.untestButton, 0, Qt.AlignRight)
+            # Replace "OK" with the corresponding HTML span
+            aligned_line = aligned_line.replace("OK", T_OK)
 
-        # company label
-        self.vBoxLayout.addSpacing(3)
-        self.vBoxLayout.addWidget(self.companyLabel, 0, Qt.AlignTop)
+            # Replace "NG" with the corresponding HTML span
+            aligned_line = aligned_line.replace("NG", T_NG)
 
-        # statistics widgets
-        self.vBoxLayout.addSpacing(20)
-        self.vBoxLayout.addLayout(self.statisticsLayout)
-        self.statisticsLayout.setContentsMargins(0, 0, 0, 0)
-        self.statisticsLayout.setSpacing(10)
+            aligned_lines.append(aligned_line)
 
-        self.statisticsLayout.setAlignment(Qt.AlignLeft)
+        aligned_text = '\n'.join(aligned_lines)
+        return aligned_text
 
-        # description label
-        self.vBoxLayout.addSpacing(20)
-        self.vBoxLayout.addWidget(self.descriptionLabel)
-
-        # button
-        self.vBoxLayout.addSpacing(12)
-        self.buttonLayout.setContentsMargins(0, 0, 0, 0)
-        self.vBoxLayout.addLayout(self.buttonLayout)
-        # self.buttonLayout.addWidget(self.tagButton, 0, Qt.AlignRight)
-        self.buttonLayout.addWidget(self.settingButton, 0, Qt.AlignRight)
+    def selection_model(self):
+        print('Button Clicked!')
 
 
 class LogCard(HeaderCardWidget):
@@ -267,9 +262,10 @@ class Window(MSFluentWindow):
 
 if __name__ == '__main__':
 
-    QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+    QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+    
 
     # setTheme(Theme.DARK)
 
