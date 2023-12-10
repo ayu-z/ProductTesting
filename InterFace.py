@@ -1,11 +1,15 @@
 # coding:utf-8
+import ProductTest
 import sys
+import os
+import json
 from pathlib import Path
 
 from PyQt5.QtCore import Qt, QPoint, QSize, QUrl, QRect, QPropertyAnimation, QEventLoop, QTimer, QFileInfo
 from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QPixmap
 from PyQt5.QtWidgets import (QApplication, QWidget, QHBoxLayout, QVBoxLayout, QGraphicsOpacityEffect, QFrame, 
-                            QAbstractButton, QSpacerItem, QSizePolicy, QFileDialog, QPushButton, QTableWidget, QTableWidgetItem)
+                            QAbstractButton, QSpacerItem, QSizePolicy, QFileDialog, QPushButton, QTableWidget, 
+                            QTableWidgetItem, QDialog, QLabel, QScrollArea, QGridLayout)
 
 from qfluentwidgets import (CardWidget, setTheme, Theme, IconWidget, BodyLabel, CaptionLabel, PushButton,
                             TransparentToolButton, FluentIcon, RoundMenu, Action, ElevatedCardWidget,
@@ -13,11 +17,111 @@ from qfluentwidgets import (CardWidget, setTheme, Theme, IconWidget, BodyLabel, 
                             HeaderCardWidget, InfoBarIcon, HyperlinkLabel, HorizontalFlipView,
                             PrimaryPushButton, TitleLabel, PillPushButton, setFont, SingleDirectionScrollArea,
                             VerticalSeparator, MSFluentWindow, NavigationItemPosition, SplashScreen, SubtitleLabel, 
-                            CheckBox, LineEdit, CompactSpinBox, ToolButton, TextEdit)
-
-from qfluentwidgets.components.widgets.acrylic_label import AcrylicBrush
+                            CheckBox, LineEdit, CompactSpinBox, ToolButton, TextEdit, PlainTextEdit, InfoBadge)
 
 
+class ImageLabel(ToolButton):
+    def __init__(self, model, image_path, parent=None):
+        super().__init__(parent)
+
+        self.model = model
+        self.image_path = image_path
+        self.initUI()
+
+    def initUI(self):
+        self.setFixedSize(150, 150)
+        pixmap = QPixmap(self.image_path)
+        if not pixmap.isNull():
+            icon = QIcon(pixmap)
+            self.setIcon(icon)
+            self.setIconSize(QSize(150, 150))
+            self.setStyleSheet("background-color: rgba(0, 0, 0, 0);")
+
+        self.clicked.connect(self.handleButtonClick)
+
+    def handleButtonClick(self):
+        print(f"Button clicked for image: {self.image_path} - Model: {self.model}")
+        # if self.model.lower() == "auto":
+            # self.searchModel()
+        self.window().close()
+        
+    # def searchModel(self):
+    #     with open("config.json", "r") as file:
+    #         config_data = json.load(file)
+    #     target_ip = config_data["target_ip"]
+    #     ssh_username = config_data["ssh_username"]
+    #     ssh_password = config_data["ssh_password"]
+    #     ssh = ProductTest.SSHClient(target_ip, ssh_username, ssh_password)
+    #     result = ssh.send_command("cat /tmp/sysinfo/model").strip()  
+    #     print(f"Device Model:{result}")
+
+class ModelSelectionDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+
+        root = QFileInfo(__file__).absolutePath()
+        self.folder_path = (root + "./resource/images/")
+        self.json_path = (root + "./resource/json/config.json")
+        self.models = self.load_models()
+
+        self.initUI()
+
+    def load_models(self):
+        try:
+            with open(self.json_path, 'r') as json_file:
+                data = json.load(json_file)
+                return data.get("Models", {})
+        except Exception as e:
+            print(f"Error loading JSON file: {e}")
+            return {}
+
+    def initUI(self):
+        self.setObjectName("ModelSelectionFrame")
+        layout = QVBoxLayout(self)
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll_area.setFrameStyle(QScrollArea.NoFrame) 
+
+        self.grid_layout = QGridLayout()
+
+        grid_widget = QWidget(self)
+        grid_widget.setLayout(self.grid_layout)
+        scroll_area.setWidget(grid_widget)
+        layout.addWidget(scroll_area)
+        self.setLayout(layout)
+        self.load_images()
+        self.setFixedSize(1100, 510)
+
+    def load_images(self):
+        for i in reversed(range(self.grid_layout.count())):
+            self.grid_layout.itemAt(i).widget().setParent(None)
+
+        row, col = 0, 0
+        for model, model_config in self.models.items():
+            image_file = f"{model}.jpg"
+            image_path = os.path.join(self.folder_path, image_file)
+
+            if not os.path.exists(image_path):
+                image_path = os.path.join(self.folder_path, "Null.png")
+
+            image_label = ImageLabel(model, image_path, self)
+            model_label = QLabel(model, self)
+
+            if model.lower() == "auto":
+                model_label.setText("自动选择")
+                
+            v_layout = QVBoxLayout()
+            v_layout.setContentsMargins(20,20,20,20)
+            v_layout.addWidget(image_label, 0, Qt.AlignCenter|Qt.AlignBottom)
+            v_layout.addWidget(model_label, 0, Qt.AlignCenter|Qt.AlignTop)
+            self.grid_layout.addLayout(v_layout, row, col)
+            col += 1
+
+            if col == 5:
+                col = 0
+                row += 1
 
 class DeviceInfoCard(SimpleCardWidget):
     """ Device info card """
@@ -31,29 +135,35 @@ class DeviceInfoCard(SimpleCardWidget):
         self.ToolButton_Model.resize(150, 150)
         self.ToolButton_Model.clicked.connect(self.selection_model)
         
-        self.TitleLabel_Model = TitleLabel('M21L2S', self)
+        self.TitleLabel_Model = TitleLabel("unknown")
+        self.TitleLabel_Model.setFixedWidth(150)
         self.textEdit_DeviceInfo = TextEdit(self)
-        data = "Header1\tHeader2\nValue1\tValue2\nData1\tData2\nOK\nNG"
-        aligned_data = self.align_multiline_text(data)
-        self.textEdit_DeviceInfo.setMarkdown(aligned_data)
         self.textEdit_DeviceInfo.setFixedSize(600, 150)
         self.textEdit_DeviceInfo.setReadOnly(True)
         self.textEdit_DeviceInfo.setFocusPolicy(Qt.NoFocus)
         self.textEdit_DeviceInfo.setStyleSheet("TextEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
+        
+        self.InfoBadge_State = InfoBadge.custom('DisConnected !', '#F08080', '#60cdff')
 
         self.hBoxLayout = QHBoxLayout(self)
+        self.leftBoxLayout = QVBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
         self.initLayout()
 
     def initLayout(self):
+        self.leftBoxLayout.addWidget(self.TitleLabel_Model)
+        self.leftBoxLayout.addWidget(self.InfoBadge_State, 0, Qt.AlignLeft )
         self.hBoxLayout.setSpacing(0)
         self.hBoxLayout.setContentsMargins(10, 10, 10, 10)
         self.hBoxLayout.addWidget(self.ToolButton_Model, 0, Qt.AlignLeft)
         self.hBoxLayout.addLayout(self.vBoxLayout)
-
+        self.vBoxLayout.addLayout(self.leftBoxLayout)
         self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
-        self.vBoxLayout.addWidget(self.TitleLabel_Model, 0, Qt.AlignLeft)
         self.vBoxLayout.addWidget(self.textEdit_DeviceInfo, 0, Qt.AlignLeft)
+        
+        self.deviceInfo_update("Header1\tHeader2\nValue1\tValue2\nData1\tData2\nOK\nNG")
+        
+        self.linkStateUpdate("192.168.111.1", "unlink")
         
     def align_multiline_text(self, data):
         T_OK = '<span style="background-color: #4CAF50; color: #ffffff; padding: 5px; display: inline-block;"> OK </span>'
@@ -76,17 +186,62 @@ class DeviceInfoCard(SimpleCardWidget):
 
         aligned_text = '\n'.join(aligned_lines)
         return aligned_text
+    
+    def deviceInfo_update(self,data):
+        aligned_data = self.align_multiline_text(data)
+        self.textEdit_DeviceInfo.setMarkdown(aligned_data)
+        
+    def deviceNameupdate(self,data):
+        if data is not None:
+            model = data
+        else:
+            data = "unknown"
+        self.TitleLabel_Model.setText(data)
+        
+    def linkStateUpdate(self, target ,state):
+        if state is None or state == 'unlink':
+            self.InfoBadge_State.setText("DisConnected !")
+            self.InfoBadge_State.setCustomBackgroundColor("#F08080", "#F08080")
+        else:
+            self.InfoBadge_State.setText("Connect {}".format(target))
+            self.InfoBadge_State.setCustomBackgroundColor("#7FFFD4", "#7FFFD4")
 
     def selection_model(self):
-        print('Button Clicked!')
+        dialog = ModelSelectionDialog()
+        dialog.setWindowTitle("测试机型选择")
+        dialog.exec_()
 
 
-class LogCard(HeaderCardWidget):
+class LogCard(SimpleCardWidget):
     """ Log card """
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setTitle('测试日志')
+        self.Lable_Log = BodyLabel(self)
+        self.Lable_Log.setObjectName("BodyLabel")
+        self.Lable_Log.setText("测试日志")
+        
+        self.textEdit_LogOutPut = TextEdit(self)
+        self.textEdit_LogOutPut.setFixedSize(770, 110)
+        self.textEdit_LogOutPut.setReadOnly(True)
+        self.textEdit_LogOutPut.setFocusPolicy(Qt.NoFocus)
+        self.textEdit_LogOutPut.setStyleSheet("TextEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
+
+        self.LineEdit_Command = LineEdit(self)
+        self.LineEdit_Command.setFixedWidth(770)
+        self.LineEdit_Command.setStyleSheet("LineEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
+        # self.LineEdit_Command.returnPressed.connect(self.executeCommand)
+        
+        self.vBoxLayout = QVBoxLayout()
+        self.initLayout()
+
+    def initLayout(self):
+        self.vBoxLayout.setContentsMargins(20, 10, 10, 10)
+        self.vBoxLayout.addWidget(self.Lable_Log, 0, Qt.AlignLeft)
+        self.vBoxLayout.addWidget(self.textEdit_LogOutPut, 0, Qt.AlignLeft)
+        self.vBoxLayout.addWidget(self.LineEdit_Command, 0, Qt.AlignLeft)
+        
+        self.setLayout(self.vBoxLayout)
 
 
 class SettingCard(SimpleCardWidget):
@@ -188,6 +343,13 @@ class SettingCard(SimpleCardWidget):
             self.Edit_FirmVersion.setText(file_name)
             self.Edit_FirmVersion.setToolTip(file_name)
 
+# coding:utf-8
+import sys
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget
+
+from qfluentwidgets import StateToolTip, PushButton, setTheme, Theme
+
 
 
         
@@ -202,6 +364,10 @@ class HomeInterFace(SingleDirectionScrollArea):
         self.DeviceInfoCard = DeviceInfoCard(self)
         self.LogCard = LogCard(self)
         self.SettingCard = SettingCard(self)
+        
+        # self.stateTooltip = StateToolTip('正在训练模型', '客官请耐心等待哦~~', self)
+        # self.stateTooltip.move(600, 10)
+        # self.stateTooltip.show()
 
         self.setWidget(self.view)
         self.setWidgetResizable(True)
@@ -211,8 +377,8 @@ class HomeInterFace(SingleDirectionScrollArea):
         self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.vBoxLayout.addWidget(self.DeviceInfoCard, 0, Qt.AlignTop)
         self.vBoxLayout.addWidget(self.LogCard, 0, Qt.AlignTop)
-        self.vBoxLayout.addWidget(self.SettingCard, 0, Qt.AlignBottom)
-        self.vBoxLayout.addSpacing(20) 
+        self.vBoxLayout.addWidget(self.SettingCard, 0, Qt.AlignTop)
+        self.vBoxLayout.addSpacing(10) 
 
         
         self.setStyleSheet("QScrollArea {border: none; background:transparent}")
@@ -245,7 +411,7 @@ class Window(MSFluentWindow):
         
     def initSplashScreen(self):
         self.splashScreen = SplashScreen(QIcon(self.root + './resource/images/ylx_logo.png'), self)
-        self.splashScreen.setIconSize(QSize(102, 102))
+        self.splashScreen.setIconSize(QSize(200, 200))
         self.show()
         loop = QEventLoop()
         QTimer.singleShot(1000, loop.quit)

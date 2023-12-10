@@ -1,17 +1,20 @@
 {
     "IPPools": [
-      {"ip":"192.168.11.1","username":"root","password":"link4all123456"},
-      {"ip":"192.168.11.1","username":"root","password":"admin@cx2021"}
+      {"ip":"192.168.111.1","username":"root","password":"root"}
     ],
-    "models": {
-        "Common":{
-            "common":"ds.common"
-
+    "Current":{
+        "model":"Auto"
+    },
+    "Models": {
+        "Auto": {
+            
         },
         "M21L2S": {
             
+        },
+        "M21AXS": {
+            
         }
-
     }
 }
   
