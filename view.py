@@ -1,23 +1,16 @@
 # coding:utf-8
-import ProductTest
+import model
 import sys
 import os
 import json
-from pathlib import Path
 
-from PyQt5.QtCore import Qt, QPoint, QSize, QUrl, QRect, QPropertyAnimation, QEventLoop, QTimer, QFileInfo
-from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QPixmap
-from PyQt5.QtWidgets import (QApplication, QWidget, QHBoxLayout, QVBoxLayout, QGraphicsOpacityEffect, QFrame, 
-                            QAbstractButton, QSpacerItem, QSizePolicy, QFileDialog, QPushButton, QTableWidget, 
-                            QTableWidgetItem, QDialog, QLabel, QScrollArea, QGridLayout)
+from PyQt5.QtCore import Qt, QSize, QEventLoop, QTimer, QFileInfo
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import (QApplication, QWidget, QHBoxLayout, QVBoxLayout, QFrame, QFileDialog, QDialog, QScrollArea, QGridLayout)
 
-from qfluentwidgets import (CardWidget, setTheme, Theme, IconWidget, BodyLabel, CaptionLabel, PushButton,
-                            TransparentToolButton, FluentIcon, RoundMenu, Action, ElevatedCardWidget,
-                            ImageLabel, isDarkTheme, FlowLayout, MSFluentTitleBar, SimpleCardWidget,
-                            HeaderCardWidget, InfoBarIcon, HyperlinkLabel, HorizontalFlipView,
-                            PrimaryPushButton, TitleLabel, PillPushButton, setFont, SingleDirectionScrollArea,
-                            VerticalSeparator, MSFluentWindow, NavigationItemPosition, SplashScreen, SubtitleLabel, 
-                            CheckBox, LineEdit, CompactSpinBox, ToolButton, TextEdit, PlainTextEdit, InfoBadge)
+from qfluentwidgets import (setTheme,  BodyLabel, FluentIcon, SimpleCardWidget,
+                            PrimaryPushButton, TitleLabel, setFont, SingleDirectionScrollArea,MSFluentWindow, SplashScreen, SubtitleLabel, 
+                            CheckBox, LineEdit, CompactSpinBox, ToolButton, TextEdit, InfoBadge, StateToolTip)
 
 
 class ImageLabel(ToolButton):
@@ -92,7 +85,7 @@ class ModelSelectionDialog(QDialog):
         layout.addWidget(scroll_area)
         self.setLayout(layout)
         self.load_images()
-        self.setFixedSize(1100, 510)
+        self.setFixedSize(880, 600)
 
     def load_images(self):
         for i in reversed(range(self.grid_layout.count())):
@@ -107,7 +100,7 @@ class ModelSelectionDialog(QDialog):
                 image_path = os.path.join(self.folder_path, "Null.png")
 
             image_label = ImageLabel(model, image_path, self)
-            model_label = QLabel(model, self)
+            model_label = BodyLabel(model, self)
 
             if model.lower() == "auto":
                 model_label.setText("自动选择")
@@ -119,7 +112,7 @@ class ModelSelectionDialog(QDialog):
             self.grid_layout.addLayout(v_layout, row, col)
             col += 1
 
-            if col == 5:
+            if col == 4:
                 col = 0
                 row += 1
 
@@ -146,18 +139,18 @@ class DeviceInfoCard(SimpleCardWidget):
         self.InfoBadge_State = InfoBadge.custom('DisConnected !', '#F08080', '#60cdff')
 
         self.hBoxLayout = QHBoxLayout(self)
-        self.leftBoxLayout = QVBoxLayout(self)
+        # self.leftBoxLayout = QVBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
         self.initLayout()
 
     def initLayout(self):
-        self.leftBoxLayout.addWidget(self.TitleLabel_Model)
-        self.leftBoxLayout.addWidget(self.InfoBadge_State, 0, Qt.AlignLeft )
-        self.hBoxLayout.setSpacing(0)
+        self.vBoxLayout.addWidget(self.TitleLabel_Model)
+        self.vBoxLayout.addWidget(self.InfoBadge_State, 0, Qt.AlignLeft )
+        # self.hBoxLayout.setSpacing(0)
         self.hBoxLayout.setContentsMargins(10, 10, 10, 10)
         self.hBoxLayout.addWidget(self.ToolButton_Model, 0, Qt.AlignLeft)
         self.hBoxLayout.addLayout(self.vBoxLayout)
-        self.vBoxLayout.addLayout(self.leftBoxLayout)
+        # self.vBoxLayout.addLayout(self.leftBoxLayout)
         self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.vBoxLayout.addWidget(self.textEdit_DeviceInfo, 0, Qt.AlignLeft)
         
@@ -193,8 +186,6 @@ class DeviceInfoCard(SimpleCardWidget):
         
     def deviceNameupdate(self,data):
         if data is not None:
-            model = data
-        else:
             data = "unknown"
         self.TitleLabel_Model.setText(data)
         
@@ -222,7 +213,7 @@ class LogCard(SimpleCardWidget):
         self.Lable_Log.setText("测试日志")
         
         self.textEdit_LogOutPut = TextEdit(self)
-        self.textEdit_LogOutPut.setFixedSize(770, 110)
+        self.textEdit_LogOutPut.setFixedSize(770, 100)
         self.textEdit_LogOutPut.setReadOnly(True)
         self.textEdit_LogOutPut.setFocusPolicy(Qt.NoFocus)
         self.textEdit_LogOutPut.setStyleSheet("TextEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
@@ -230,7 +221,7 @@ class LogCard(SimpleCardWidget):
         self.LineEdit_Command = LineEdit(self)
         self.LineEdit_Command.setFixedWidth(770)
         self.LineEdit_Command.setStyleSheet("LineEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
-        # self.LineEdit_Command.returnPressed.connect(self.executeCommand)
+        self.LineEdit_Command.returnPressed.connect(self.executeCommand)
         
         self.vBoxLayout = QVBoxLayout()
         self.initLayout()
@@ -242,6 +233,9 @@ class LogCard(SimpleCardWidget):
         self.vBoxLayout.addWidget(self.LineEdit_Command, 0, Qt.AlignLeft)
         
         self.setLayout(self.vBoxLayout)
+
+    def executeCommand(self):
+        print (f"Executing command:{self.LineEdit_Command.text()}")
 
 
 class SettingCard(SimpleCardWidget):
@@ -343,14 +337,6 @@ class SettingCard(SimpleCardWidget):
             self.Edit_FirmVersion.setText(file_name)
             self.Edit_FirmVersion.setToolTip(file_name)
 
-# coding:utf-8
-import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget
-
-from qfluentwidgets import StateToolTip, PushButton, setTheme, Theme
-
-
 
         
 class HomeInterFace(SingleDirectionScrollArea):
@@ -365,9 +351,9 @@ class HomeInterFace(SingleDirectionScrollArea):
         self.LogCard = LogCard(self)
         self.SettingCard = SettingCard(self)
         
-        # self.stateTooltip = StateToolTip('正在训练模型', '客官请耐心等待哦~~', self)
-        # self.stateTooltip.move(600, 10)
-        # self.stateTooltip.show()
+        self.stateTooltip = StateToolTip('正在训练模型', '客官请耐心等待哦~~', self)
+        self.stateTooltip.move(600, 10)
+        self.stateTooltip.show()
 
         self.setWidget(self.view)
         self.setWidgetResizable(True)
