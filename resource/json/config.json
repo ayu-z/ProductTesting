@@ -1,28 +1,29 @@
 {
-    "Current":{
-        "model":"M21L2S"
+    "Current": {
+        "model": "M21L2S"
     },
     "Models": {
-        "Auto": {
-            
-        },
+        "Auto": {},
         "M21L2S": {
-            "ip":"192.168.111.1",
-            "username":"root",
-            "password":"iyunlink2014"
+            "ip": "192.168.111.1",
+            "username": "root",
+            "password": "iyunlink2014",
+            "mac": {
+                "enabled": 2,
+                "start": "18C3F400002",
+                "offset": 4,
+                "check": 2,
+                "checkfields": "18C3F4cd"
+            },
+            "upgrade": {
+                "enabled": 2,
+                "version": "E:/yu/ProductTesting/ssh.py"
+            },
+            "test": {}
         },
-        "M21AX": {
-            
-        },
-        "M21AXS": {
-            
-        },
-        "M28": {
-            
-        },
-        "Q31": {
-            
-        }
+        "M21AX": {},
+        "M21AXS": {},
+        "M28": {},
+        "Q31": {}
     }
 }
-  

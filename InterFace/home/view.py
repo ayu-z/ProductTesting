@@ -1,16 +1,16 @@
 # coding:utf-8
-import model
-import sys
+# import model
+# import sys
 import os
 import json
 
-from PyQt5.QtCore import Qt, QSize, QEventLoop, QTimer, QFileInfo
+from PyQt5.QtCore import Qt, QSize, QEventLoop, QTimer, QFileInfo, QTime, QStandardPaths, QDate
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import (QApplication, QWidget, QHBoxLayout, QVBoxLayout, QFrame, QFileDialog, QDialog, QScrollArea, QGridLayout)
+from PyQt5.QtWidgets import (QApplication, QWidget, QHBoxLayout, QVBoxLayout, QFrame, QFileDialog, QDialog, QScrollArea, QGridLayout, QPlainTextEdit)
 
 from qfluentwidgets import (setTheme,  BodyLabel, FluentIcon, SimpleCardWidget,
                             PrimaryPushButton, TitleLabel, setFont, SingleDirectionScrollArea,MSFluentWindow, SplashScreen, SubtitleLabel, 
-                            CheckBox, LineEdit, CompactSpinBox, ToolButton, TextEdit, InfoBadge, StateToolTip)
+                            CheckBox, LineEdit, CompactSpinBox, ToolButton, TextEdit, InfoBadge, StateToolTip, PlainTextEdit)
 
 
 class ImageLabel(ToolButton):
@@ -92,7 +92,7 @@ class ModelSelectionDialog(QDialog):
             self.grid_layout.itemAt(i).widget().setParent(None)
 
         row, col = 0, 0
-        for model, model_config in self.models.items():
+        for model in self.models.items():
             image_file = f"{model}.jpg"
             image_path = os.path.join(self.folder_path, image_file)
 
@@ -188,7 +188,6 @@ class DeviceInfoCard(SimpleCardWidget):
     def deviceNameupdate(self,data):
         if data is None:
             data = "unknown"
-        print (data)
         self.TitleLabel_Model.setText(data)
         self.ToolButton_Model.setIcon(self.root + f"./../../resource/images/{data}.jpg")
         
@@ -215,24 +214,28 @@ class LogCard(SimpleCardWidget):
         self.Lable_Log.setObjectName("BodyLabel")
         self.Lable_Log.setText("测试日志")
         
-        self.textEdit_LogOutPut = TextEdit(self)
-        self.textEdit_LogOutPut.setFixedSize(770, 100)
+        self.textEdit_LogOutPut = PlainTextEdit(self)
+        self.textEdit_LogOutPut.setFixedSize(770, 165)
         self.textEdit_LogOutPut.setReadOnly(True)
         self.textEdit_LogOutPut.setFocusPolicy(Qt.NoFocus)
-        self.textEdit_LogOutPut.setStyleSheet("TextEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
+        self.textEdit_LogOutPut.setMaximumBlockCount(50)
+        self.textEdit_LogOutPut.setStyleSheet("PlainTextEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
 
         self.LineEdit_Command = LineEdit(self)
         self.LineEdit_Command.setFixedWidth(770)
         self.LineEdit_Command.setStyleSheet("LineEdit { border: 0px solid gray; border-radius: 0px; padding: 0px; }")
         self.LineEdit_Command.returnPressed.connect(self.executeCommand)
+
+        self.logMessageUpdate('ygvyhbjknmdl;')
         
         self.vBoxLayout = QVBoxLayout()
         self.initLayout()
 
     def initLayout(self):
-        self.vBoxLayout.setContentsMargins(20, 10, 10, 10)
+        self.vBoxLayout.setContentsMargins(20, 5, 10, 5)
         self.vBoxLayout.addWidget(self.Lable_Log, 0, Qt.AlignLeft)
         self.vBoxLayout.addWidget(self.textEdit_LogOutPut, 0, Qt.AlignLeft)
+        self.vBoxLayout.setSpacing(5)
         self.vBoxLayout.addWidget(self.LineEdit_Command, 0, Qt.AlignLeft)
         
         self.setLayout(self.vBoxLayout)
@@ -240,11 +243,31 @@ class LogCard(SimpleCardWidget):
     def executeCommand(self):
         print (f"Executing command:{self.LineEdit_Command.text()}")
 
+    def logMessageUpdate(self, message):
+        currentTime = QTime.currentTime().toString('HH:mm:ss')
+        message = f'[{currentTime}]-: {message}'
+        self.textEdit_LogOutPut.appendPlainText(message)
+        self.saveLogToFile(message)
+
+    def saveLogToFile(self, message):
+        documents_path = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
+        current_date = QDate.currentDate()
+        logFolder_path = os.path.join(documents_path, "ProductTest", "Log")
+        if not os.path.exists(logFolder_path):
+            os.makedirs(logFolder_path)
+        file_path = os.path.join(logFolder_path, f"{current_date.toString('yyyy-MM-dd')}.log")
+        with open(file_path, 'a') as file:
+            file.write(message)
+
+
+
 
 class SettingCard(SimpleCardWidget):
     """ Setting card """
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.json_path = (QFileInfo(__file__).absolutePath() + "./../../resource/json/config.json")
+        self.model = "M21L2S"
 
         self.CheckBox_Mac = CheckBox(self)
         self.CheckBox_Mac.setObjectName("CheckBox_Mac")
@@ -287,11 +310,12 @@ class SettingCard(SimpleCardWidget):
         self.Button_FileSel = PrimaryPushButton(self)
         self.Button_FileSel.setObjectName("Button_FileSel")
         self.Button_FileSel.setText("选择")
-        self.Button_FileSel.clicked.connect(self.show_file_dialog)
+        self.Button_FileSel.clicked.connect(self.showFileDialog)
         
         self.Button_Save = PrimaryPushButton(self)
         self.Button_Save.setObjectName("Button_Save")
         self.Button_Save.setText("保存")
+        self.Button_Save.clicked.connect(self.settingConfigSave)
         
         self.testButton = PrimaryPushButton('测试', self)
         self.testButton.setFixedSize(90, 60)
@@ -333,12 +357,49 @@ class SettingCard(SimpleCardWidget):
         self.hBoxLayout.addWidget(self.testButton)
         self.hBoxLayout.addSpacing(10)
         self.setLayout(self.hBoxLayout)
+        self.settingConfigLoad(self.model)
         
-    def show_file_dialog(self):
+    def showFileDialog(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "选择文件", "", "All Files (*);;Text Files (*.txt)")
         if file_name:
             self.Edit_FirmVersion.setText(file_name)
             self.Edit_FirmVersion.setToolTip(file_name)
+
+    def settingConfigLoad(self, model):
+        data = self.load_models()
+        self.CheckBox_Mac.setCheckState(data[model]["mac"]["enabled"])
+        self.Edit_Mac.setText(data[model]["mac"]["start"])
+        self.CompactSpinBox_MacOffset.setValue(data[model]["mac"]["offset"])
+        self.CheckBox_MacCheck.setCheckState(data[model]["mac"]["check"])
+        self.Edit_MacCheck.setText(data[model]["mac"]["checkfields"])
+        self.CheckBox_FirmUpdate.setCheckState(data[model]["upgrade"]["enabled"])
+        self.Edit_FirmVersion.setText(data[model]["upgrade"]["version"])
+
+    def settingConfigSave(self):
+        with open(self.json_path, 'r') as file:
+            data = json.load(file)
+
+        data["Models"][self.model]["mac"]["enabled"] = self.CheckBox_Mac.checkState()
+        data["Models"][self.model]["mac"]["start"] = self.Edit_Mac.text()
+        data["Models"][self.model]["mac"]["offset"] = self.CompactSpinBox_MacOffset.value()
+        data["Models"][self.model]["mac"]["check"] = self.CheckBox_MacCheck.checkState()
+        data["Models"][self.model]["mac"]["checkfields"] = self.Edit_MacCheck.text()
+        data["Models"][self.model]["upgrade"]["enabled"] = self.CheckBox_FirmUpdate.checkState()
+        data["Models"][self.model]["upgrade"]["version"] = self.Edit_FirmVersion.text()
+
+        with open(self.json_path, 'w') as file:
+            json.dump(data, file, indent=4)
+        self.settingConfigLoad(self.model)
+
+    
+    def load_models(self):
+        try:
+            with open(self.json_path, 'r') as json_file:
+                data = json.load(json_file)
+                return data.get("Models", {})
+        except Exception as e:
+            print(f"Error loading JSON file: {e}")
+            return {}
 
 
         
@@ -365,6 +426,7 @@ class HomeInterFace(SingleDirectionScrollArea):
         self.vBoxLayout.addWidget(self.SettingCard, 0, Qt.AlignTop)
         self.vBoxLayout.addSpacing(10) 
 
+        self.LogCard.logMessageUpdate('g\n\n\n\n\n\\n\n\n\\n\n\n\n\n\\n\nn\n\nyvb cjnkds,;')
         
         self.setStyleSheet("QScrollArea {border: none; background:transparent}")
         self.view.setStyleSheet('QWidget {background:transparent}')

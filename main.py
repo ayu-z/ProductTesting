@@ -15,7 +15,7 @@ class Window(MSFluentWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.root = QFileInfo(__file__).absolutePath()
-        self.setFixedSize(880, 600)
+        self.setFixedSize(880, 650)
         self.setWindowTitle('Product Test Tool')
         self.setWindowIcon(QIcon(self.root + './resource/images/iyl_logo.png'))
         self.titleBar.raise_()
@@ -54,5 +54,5 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     w = Window()
-    w.show()
+    w.show() 
     app.exec_()
