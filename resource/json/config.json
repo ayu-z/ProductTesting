@@ -17,7 +17,7 @@
             },
             "upgrade": {
                 "enabled": 2,
-                "version": "E:/yu/ProductTesting/ssh.py"
+                "version": "E:/yu/ProductTesting/main.py"
             },
             "test": {}
         },

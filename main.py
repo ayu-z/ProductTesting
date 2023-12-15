@@ -10,6 +10,7 @@ from qfluentwidgets import (setTheme,FluentIcon,MSFluentWindow, SplashScreen)
 
 import InterFace.home.view as HomeView
 
+
 class Window(MSFluentWindow):
 
     def __init__(self, parent=None):
@@ -20,9 +21,10 @@ class Window(MSFluentWindow):
         self.setWindowIcon(QIcon(self.root + './resource/images/iyl_logo.png'))
         self.titleBar.raise_()
         self.initSplashScreen()
-        
         self.initNavigation()
-        
+
+        self.Controller = HomeView.Controller()
+        self.Controller.linkStateUpdate(target="192.168.11.1", state="link")
         
     def initSplashScreen(self):
         self.splashScreen = SplashScreen(QIcon(self.root + './resource/images/ylx_logo.png'), self)
@@ -34,11 +36,8 @@ class Window(MSFluentWindow):
         self.splashScreen.finish()
     
     def initNavigation(self):
-        self.homeInterface = HomeView.HomeInterFace(self)
+        self.homeInterface = HomeView.View(self)
         self.appInterface = HomeView.Widget('开发中...')
-        
-        self.homeInterface.DeviceInfoCard.deviceNameupdate('M21L2S')
-
         self.addSubInterface(self.homeInterface, FluentIcon.HOME, "主页", FluentIcon.HOME_FILL, isTransparent=True)
         self.addSubInterface(self.appInterface, FluentIcon.APPLICATION, '应用')
 
@@ -55,4 +54,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = Window()
     w.show() 
+    
     app.exec_()
