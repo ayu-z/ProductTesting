@@ -10,14 +10,14 @@
             "password": "iyunlink2014",
             "mac": {
                 "enabled": 2,
-                "start": "18C3F400002",
-                "offset": 4,
+                "start": "18C3F400000",
+                "offset": 2,
                 "check": 2,
-                "checkfields": "18C3F4cd"
+                "checkfields": "18C3F4"
             },
             "upgrade": {
                 "enabled": 2,
-                "version": "E:/yu/ProductTesting/main.py"
+                "version": "C:/Users/yuzui/Desktop/ProductTesting/InterFace/home/view.py"
             },
             "test": {}
         },

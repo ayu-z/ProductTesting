@@ -23,8 +23,7 @@ class Window(MSFluentWindow):
         self.initSplashScreen()
         self.initNavigation()
 
-        self.Controller = HomeView.Controller()
-        self.Controller.linkStateUpdate(target="192.168.11.1", state="link")
+        # self.homeInterface.DeviceInfoCard.TitleLabel_Model.setText("link")
         
     def initSplashScreen(self):
         self.splashScreen = SplashScreen(QIcon(self.root + './resource/images/ylx_logo.png'), self)
@@ -40,7 +39,8 @@ class Window(MSFluentWindow):
         self.appInterface = HomeView.Widget('开发中...')
         self.addSubInterface(self.homeInterface, FluentIcon.HOME, "主页", FluentIcon.HOME_FILL, isTransparent=True)
         self.addSubInterface(self.appInterface, FluentIcon.APPLICATION, '应用')
-
+        
+        self.Controller = HomeView.Controller(HomeView.Model(), self.homeInterface)
 
 if __name__ == '__main__':
 

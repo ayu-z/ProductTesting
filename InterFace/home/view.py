@@ -191,7 +191,7 @@ class LogCard(SimpleCardWidget):
 
 class SettingCard(SimpleCardWidget):
     """ Setting card """
-    saveJsonSignal = pyqtSignal()
+    # saveJsonSignal = pyqtSignal()
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -241,7 +241,7 @@ class SettingCard(SimpleCardWidget):
         self.Button_Save = PrimaryPushButton(self)
         self.Button_Save.setObjectName("Button_Save")
         self.Button_Save.setText("保存")
-        self.Button_Save.clicked.connect(self.saveJsonSignal)
+        # self.Button_Save.clicked.connect(self.saveJsonSignal)
         
         
         self.testButton = PrimaryPushButton('测试', self)
@@ -375,18 +375,19 @@ class Model:
             return {}
 
 class Controller:
-    def __init__(self):
-        self._model = Model()
-        self._view = View()
+    def __init__(self, model, view):
+        self._model = model
+        self._view = view
 
         self.root = QFileInfo(__file__).absolutePath()
         self.currentModel = self._model.currentModel
 
-        self._view.SettingCard.saveJsonSignal.connect(self.settingConfigSave)
+        # self._view.SettingCard.saveJsonSignal.connect(self.settingConfigSave)
         self._view.SettingCard.Button_Save.clicked.connect(self.settingConfigSave)
-        self._view.LogCard.LineEdit_Command.returnPressed.connect(self.executeCommand)
+        # self._view.LogCard.LineEdit_Command.returnPressed.connect(self.executeCommand)
 
-        # self.settingConfigLoad(self)
+        self.settingConfigLoad()
+        self.deviceNameupdate(self.currentModel)
     
     def deviceInfoUpdate(self,data):
         self._view.DeviceInfoCard.textEdit_DeviceInfo.setMarkdown(self._model.alignMultilineText(data))
@@ -425,7 +426,7 @@ class Controller:
             file.write(message)
 
     def settingConfigLoad(self):
-        data = self._model.loadJsonConfig(self)
+        data = self._model.loadJsonConfig()
         self._view.SettingCard.CheckBox_Mac.setCheckState(data["Models"][self.currentModel]["mac"]["enabled"])
         self._view.SettingCard.Edit_Mac.setText(data["Models"][self.currentModel]["mac"]["start"])
         self._view.SettingCard.CompactSpinBox_MacOffset.setValue(data["Models"][self.currentModel]["mac"]["offset"])
