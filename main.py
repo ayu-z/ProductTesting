@@ -8,9 +8,9 @@ from PyQt5.QtWidgets import (QApplication)
 
 from qfluentwidgets import (setTheme,FluentIcon,MSFluentWindow, SplashScreen)
 
-import InterFace.home.model as ui_MHome
-import InterFace.home.view as ui_VHome
-import InterFace.home.controller as ui_CHome
+import ui.home.model as ui_MHome
+import ui.home.view as ui_VHome
+import ui.home.controller as ui_CHome
 
 
 
