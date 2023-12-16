@@ -1,13 +1,64 @@
 {
+    "Global": {
+        "ip": "192.168.11.1",
+        "username": "root",
+        "password": "link4all123456",
+        "mac": {
+            "enabled": 2,
+            "start": "18C3F400000",
+            "offset": 2,
+            "check": 2,
+            "checkfields": "18C3F4"
+        },
+        "upgrade": {
+            "enabled": 2,
+            "version": ""
+        },
+        "test": {}
+    },
     "Current": {
-        "model": "M21L2S"
+        "model": "M21AXS"
     },
     "Models": {
         "Auto": {},
         "M21L2S": {
-            "ip": "192.168.111.1",
+            "upgrade": {
+                "enabled": 2,
+                "version": "E:/yu/ProductTesting/test.py"
+            },
+            "test": {},
+            "ip": "192.168.11.1",
             "username": "root",
-            "password": "iyunlink2014",
+            "password": "link4all123456",
+            "mac": {
+                "enabled": 2,
+                "start": "18C3F400000",
+                "offset": 2,
+                "check": 2,
+                "checkfields": "18C3F4"
+            }
+        },
+        "M21AX": {
+            "ip": "192.168.11.1",
+            "username": "root",
+            "password": "link4all123456",
+            "mac": {
+                "enabled": 2,
+                "start": "18C3F400000",
+                "offset": 3,
+                "check": 2,
+                "checkfields": "18C3F4"
+            },
+            "upgrade": {
+                "enabled": 2,
+                "version": "E:/yu/ProductTesting/main.py"
+            },
+            "test": {}
+        },
+        "M21AXS": {
+            "ip": "192.168.11.1",
+            "username": "root",
+            "password": "link4all123456",
             "mac": {
                 "enabled": 2,
                 "start": "18C3F400000",
@@ -17,13 +68,43 @@
             },
             "upgrade": {
                 "enabled": 2,
-                "version": "C:/Users/yuzui/Desktop/ProductTesting/InterFace/home/view.py"
+                "version": "E:/yu/ProductTesting/main.py"
             },
             "test": {}
         },
-        "M21AX": {},
-        "M21AXS": {},
-        "M28": {},
-        "Q31": {}
+        "M28": {
+            "ip": "192.168.11.1",
+            "username": "root",
+            "password": "link4all123456",
+            "mac": {
+                "enabled": 2,
+                "start": "18C3F400000",
+                "offset": 2,
+                "check": 2,
+                "checkfields": "18C3F4"
+            },
+            "upgrade": {
+                "enabled": 2,
+                "version": ""
+            },
+            "test": {}
+        },
+        "Q31": {
+            "ip": "192.168.11.1",
+            "username": "root",
+            "password": "link4all123456",
+            "mac": {
+                "enabled": 2,
+                "start": "18C3F400000",
+                "offset": 2,
+                "check": 2,
+                "checkfields": "18C3F4"
+            },
+            "upgrade": {
+                "enabled": 2,
+                "version": "E:/yu/ProductTesting/main.py"
+            },
+            "test": {}
+        }
     }
 }

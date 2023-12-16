@@ -14,6 +14,7 @@ from qfluentwidgets import (setTheme,  BodyLabel, FluentIcon, SimpleCardWidget,
 
 
 class ImageLabel(ToolButton):
+    modelSelectSignal = pyqtSignal(str)
     def __init__(self, model, image_path, parent=None):
         super().__init__(parent)
 
@@ -30,25 +31,18 @@ class ImageLabel(ToolButton):
             self.setIconSize(QSize(150, 150))
             self.setStyleSheet("background-color: rgba(0, 0, 0, 0);")
 
-        self.clicked.connect(self.handleButtonClick)
+        self.clicked.connect(self.modelSelectButtonClick)
 
-    def handleButtonClick(self):
+    def modelSelectButtonClick(self):
         print(f"Button clicked for image: {self.image_path} - Model: {self.model}")
-        # if self.model.lower() == "auto":
-            # self.searchModel()
+        self.modelSelectSignal.emit(self.model)
         self.window().close()
-        
-    # def searchModel(self):
-    #     with open("config.json", "r") as file:
-    #         config_data = json.load(file)
-    #     target_ip = config_data["target_ip"]
-    #     ssh_username = config_data["ssh_username"]
-    #     ssh_password = config_data["ssh_password"]
-    #     ssh = ProductTest.SSHClient(target_ip, ssh_username, ssh_password)
-    #     result = ssh.send_command("cat /tmp/sysinfo/model").strip()  
-    #     print(f"Device Model:{result}")
 
-class ModelSelectionDialog(QDialog):
+
+class modelSelectionDialog(QDialog):
+
+    modelSelectedSignal = pyqtSignal(str)
+
     def __init__(self):
         super().__init__()
 
@@ -56,7 +50,6 @@ class ModelSelectionDialog(QDialog):
         self.folder_path = (root + "./../../resource/images/")
         self.json_path = (root + "./../../resource/json/config.json")
         self.models = self.loadJsonConfig()
-
         self.initUI()
 
     def loadJsonConfig(self):
@@ -99,7 +92,7 @@ class ModelSelectionDialog(QDialog):
             if not os.path.exists(image_path):
                 image_path = os.path.join(self.folder_path, "Null.jpg")
 
-            image_label = ImageLabel(model, image_path)
+            self.image_label = ImageLabel(model, image_path)
             model_label = BodyLabel(model)
 
             if model.lower() == "auto":
@@ -107,7 +100,7 @@ class ModelSelectionDialog(QDialog):
                 
             v_layout = QVBoxLayout()
             v_layout.setContentsMargins(20,20,20,20)
-            v_layout.addWidget(image_label, 0, Qt.AlignCenter|Qt.AlignBottom)
+            v_layout.addWidget(self.image_label, 0, Qt.AlignCenter|Qt.AlignBottom)
             v_layout.addWidget(model_label, 0, Qt.AlignCenter|Qt.AlignTop)
             self.grid_layout.addLayout(v_layout, row, col)
             col += 1
@@ -115,6 +108,11 @@ class ModelSelectionDialog(QDialog):
             if col == 4:
                 col = 0
                 row += 1
+            self.image_label.modelSelectSignal.connect(self.handleModelClicked)
+
+    def handleModelClicked(self, model):
+        print(f"Received Model Clicked Signal: {model}")
+        self.modelSelectedSignal.emit(model)
 
 class DeviceInfoCard(SimpleCardWidget):
     """ Device info card """
@@ -147,11 +145,13 @@ class DeviceInfoCard(SimpleCardWidget):
         
         # self.deviceInfoUpdate("Header1\tHeader2\nValue1\tValue2\nData1\tData2\nOK\nNG")
         # self.linkStateUpdate("192.168.111.1", "unlink")
+        self.dialog = modelSelectionDialog()
+        self.dialog.setWindowTitle("测试机型选择")
+        
 
     def selectionModel(self):
-        dialog = ModelSelectionDialog()
-        dialog.setWindowTitle("测试机型选择")
-        dialog.exec_()
+        self.dialog.exec_()
+        
 
 
 class LogCard(SimpleCardWidget):
@@ -191,7 +191,7 @@ class LogCard(SimpleCardWidget):
 
 class SettingCard(SimpleCardWidget):
     """ Setting card """
-    # saveJsonSignal = pyqtSignal()
+    saveJsonSignal = pyqtSignal()
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -241,7 +241,7 @@ class SettingCard(SimpleCardWidget):
         self.Button_Save = PrimaryPushButton(self)
         self.Button_Save.setObjectName("Button_Save")
         self.Button_Save.setText("保存")
-        # self.Button_Save.clicked.connect(self.saveJsonSignal)
+        self.Button_Save.clicked.connect(self.saveJsonSignal)
         
         
         self.testButton = PrimaryPushButton('测试', self)
@@ -334,117 +334,6 @@ class Widget(QFrame):
 
 
 
-class Model:
-    def __init__(self):
-        self.currentModel = "M21L2S"
 
-        root = QFileInfo(__file__).absolutePath()
-        self.folder_path = (root + "./../../resource/images/")
-        self.json_path = (root + "./../../resource/json/config.json")
-    
-    def alignMultilineText(self, data):
-        T_OK = '<span style="background-color: #4CAF50; color: #ffffff; padding: 5px; display: inline-block;"> OK </span>'
-        T_NG = '<span style="background-color: #FF0000; color: #ffffff; padding: 5px; display: inline-block;"> NG </span>'
-        lines = data.split('\n')
-        max_widths = [max(len(field) for field in line.split('\t')) for line in lines]
-        aligned_lines = []
-        for line in lines:
-            fields = line.split('\t')
-            aligned_fields = ["{:<{}}".format(field, max_width) for field, max_width in zip(fields, max_widths)]
-            aligned_line = '#### '+'\t\t\t'.join(aligned_fields)
-            aligned_line = aligned_line.replace("OK", T_OK)
-            aligned_line = aligned_line.replace("NG", T_NG)
-            aligned_lines.append(aligned_line)
-        aligned_text = '\n'.join(aligned_lines)
-        return aligned_text
 
-    def loadJsonConfig(self):
-        try:
-            with open(self.json_path, 'r') as json_file:
-                return json.load(json_file)
-        except Exception as e:
-            print(f"Error loading JSON file: {e}")
-            return {}
-        
-    def saveJsonConfig(self, data):
-        try:
-            with open(self.json_path, 'w') as file:
-                json.dump(data, file, indent=4)
-        except Exception as e:
-            print(f"Error loading JSON file: {e}")
-            return {}
 
-class Controller:
-    def __init__(self, model, view):
-        self._model = model
-        self._view = view
-
-        self.root = QFileInfo(__file__).absolutePath()
-        self.currentModel = self._model.currentModel
-
-        # self._view.SettingCard.saveJsonSignal.connect(self.settingConfigSave)
-        self._view.SettingCard.Button_Save.clicked.connect(self.settingConfigSave)
-        # self._view.LogCard.LineEdit_Command.returnPressed.connect(self.executeCommand)
-
-        self.settingConfigLoad()
-        self.deviceNameupdate(self.currentModel)
-    
-    def deviceInfoUpdate(self,data):
-        self._view.DeviceInfoCard.textEdit_DeviceInfo.setMarkdown(self._model.alignMultilineText(data))
-        
-    def deviceNameupdate(self,data):
-        if data is None:
-            data = "unknown"
-        self._view.DeviceInfoCard.TitleLabel_Model.setText(data)
-        self._view.DeviceInfoCard.ToolButton_Model.setIcon(self.root + f"./../../resource/images/{data}.jpg")
-        
-    def linkStateUpdate(self, target ,state):
-        if state is None or state == 'unlink':
-            self._view.DeviceInfoCard.InfoBadge_State.setText("DisConnected !")
-            self._view.DeviceInfoCard.InfoBadge_State.setCustomBackgroundColor("#F08080", "#F08080")
-        else:
-            self._view.DeviceInfoCard.InfoBadge_State.setText("Connect {}".format(target))
-            self._view.DeviceInfoCard.InfoBadge_State.setCustomBackgroundColor("#7FFFD4", "#7FFFD4")
-
-    def executeCommand(self):
-        print (f"Executing command:{self._view.LogCard.LineEdit_Command.text()}")
-
-    def logMessageUpdate(self, message):
-        currentTime = QTime.currentTime().toString('HH:mm:ss')
-        message = f'[{currentTime}]-: {message}'
-        self._view.LogCard.textEdit_LogOutPut.appendPlainText(message)
-        self.saveLogToFile("\n".format(message))
-
-    def saveLogToFile(self, message):
-        documents_path = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
-        current_date = QDate.currentDate()
-        logFolder_path = os.path.join(documents_path, "ProductTest", "Log")
-        if not os.path.exists(logFolder_path):
-            os.makedirs(logFolder_path)
-        file_path = os.path.join(logFolder_path, f"{current_date.toString('yyyy-MM-dd')}.log")
-        with open(file_path, 'a') as file:
-            file.write(message)
-
-    def settingConfigLoad(self):
-        data = self._model.loadJsonConfig()
-        self._view.SettingCard.CheckBox_Mac.setCheckState(data["Models"][self.currentModel]["mac"]["enabled"])
-        self._view.SettingCard.Edit_Mac.setText(data["Models"][self.currentModel]["mac"]["start"])
-        self._view.SettingCard.CompactSpinBox_MacOffset.setValue(data["Models"][self.currentModel]["mac"]["offset"])
-        self._view.SettingCard.CheckBox_MacCheck.setCheckState(data["Models"][self.currentModel]["mac"]["check"])
-        self._view.SettingCard.Edit_MacCheck.setText(data["Models"][self.currentModel]["mac"]["checkfields"])
-        self._view.SettingCard.CheckBox_FirmUpdate.setCheckState(data["Models"][self.currentModel]["upgrade"]["enabled"])
-        self._view.SettingCard.Edit_FirmVersion.setText(data["Models"][self.currentModel]["upgrade"]["version"])
-
-    def settingConfigSave(self):
-        print("SettingConfigSave")
-        data = self._model.loadJsonConfig()
-        data["Models"][self.currentModel]["mac"]["enabled"] = self._view.SettingCard.CheckBox_Mac.checkState()
-        data["Models"][self.currentModel]["mac"]["start"] = self._view.SettingCard.Edit_Mac.text()
-        data["Models"][self.currentModel]["mac"]["offset"] = self._view.SettingCard.CompactSpinBox_MacOffset.value()
-        data["Models"][self.currentModel]["mac"]["check"] = self._view.SettingCard.CheckBox_MacCheck.checkState()
-        data["Models"][self.currentModel]["mac"]["checkfields"] = self._view.SettingCard.Edit_MacCheck.text()
-        data["Models"][self.currentModel]["upgrade"]["enabled"] = self._view.SettingCard.CheckBox_FirmUpdate.checkState()
-        data["Models"][self.currentModel]["upgrade"]["version"] = self._view.SettingCard.Edit_FirmVersion.text()
-        self._model.saveJsonConfig(data)
-        self.settingConfigLoad()
-        

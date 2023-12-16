@@ -8,7 +8,10 @@ from PyQt5.QtWidgets import (QApplication)
 
 from qfluentwidgets import (setTheme,FluentIcon,MSFluentWindow, SplashScreen)
 
-import InterFace.home.view as HomeView
+import InterFace.home.model as ui_MHome
+import InterFace.home.view as ui_VHome
+import InterFace.home.controller as ui_CHome
+
 
 
 class Window(MSFluentWindow):
@@ -35,12 +38,12 @@ class Window(MSFluentWindow):
         self.splashScreen.finish()
     
     def initNavigation(self):
-        self.homeInterface = HomeView.View(self)
-        self.appInterface = HomeView.Widget('开发中...')
+        self.homeInterface = ui_VHome.View(self)
+        self.appInterface = ui_VHome.Widget('开发中...')
         self.addSubInterface(self.homeInterface, FluentIcon.HOME, "主页", FluentIcon.HOME_FILL, isTransparent=True)
         self.addSubInterface(self.appInterface, FluentIcon.APPLICATION, '应用')
         
-        self.Controller = HomeView.Controller(HomeView.Model(), self.homeInterface)
+        self.controller = ui_CHome.Controller(ui_MHome.Model(), self.homeInterface)
 
 if __name__ == '__main__':
 
